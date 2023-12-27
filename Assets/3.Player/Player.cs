@@ -11,9 +11,9 @@ public class Player : Unit
     private GameObject SaveBullet;
     public static Player Instance;
 
-    private void Awake()
+    override protected void Awake()
     {
-        Instance = this;   
+        Instance = this;
     }
 
     private void Start()
@@ -34,7 +34,7 @@ public class Player : Unit
         dir.x = x;
         dir.z = z;
         dir.Normalize();
-        transform.Translate(dir * speed * Time.fixedDeltaTime);
+        transform.Translate(dir * UnitStat.MoveSpeed * Time.fixedDeltaTime);
     }
 
     private IEnumerator Shoot()

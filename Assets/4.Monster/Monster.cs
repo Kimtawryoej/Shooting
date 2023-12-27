@@ -9,16 +9,13 @@ public class Monster : Unit
 
     public static Monster Instance;
 
-    private void OnEnable()
-    {
-        transform.rotation = Quaternion.Euler(0, 60, 0);
-    }
 
-    private void Awake()
+
+    override protected void Awake()
     {
         Instance = this;
     }
-        
+
 
     private void Start()
     {
