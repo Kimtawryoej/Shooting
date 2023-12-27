@@ -4,28 +4,29 @@ using UnityEngine;
 
 public class ObjectPool : SingleTone<ObjectPool>
 {
-    private Dictionary<GameObject, LinkedStack<GameObject>> pool = new Dictionary<GameObject, LinkedStack<GameObject>>();
+    private Dictionary<LayerMask, LinkedStack<GameObject>> pool = new Dictionary<LayerMask, LinkedStack<GameObject>>();
     private GameObject saveObj;
-    public void  OutObject(GameObject prefab, Vector3 position, Quaternion rotation)
+    public GameObject  OutObject(LayerMask layer, GameObject prefab,Vector3 position, Quaternion rotation)
     {
-        if (!pool.ContainsKey(prefab))
+        if (!pool.ContainsKey(layer))
         {
             LinkedStack<GameObject> SaveStack = new LinkedStack<GameObject>();
-            pool.Add(prefab, SaveStack);
+            pool.Add(layer, SaveStack);
         }
-        if (pool[prefab].Count().Equals(0))
+        if (pool[layer].Count().Equals(0))
         {
             saveObj = Instantiate(prefab);
         }
         else
         {
-            saveObj = pool[prefab].Push();
+            saveObj = pool[layer].Push();
             saveObj.SetActive(true);
         }
         saveObj.transform.SetPositionAndRotation(position, rotation);
+        return saveObj;
     }
 
-    public void InObject(GameObject prefab, GameObject bfInObj)
+    public void InObject(LayerMask prefab, GameObject bfInObj)
     {
         if (pool.ContainsKey(prefab))
         {

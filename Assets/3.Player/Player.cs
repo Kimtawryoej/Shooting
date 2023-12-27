@@ -9,18 +9,22 @@ public class Player : Unit
     private float z;
     private Vector3 dir = new Vector3(0, 0, 0);
     private GameObject SaveBullet;
+    public static Player Instance;
+
+    private void Awake()
+    {
+        Instance = this;   
+    }
+
     private void Start()
     {
         StartCoroutine(Shoot());
     }
 
-    private void Update()
-    {
-
-    }
     private void FixedUpdate()
     {
         Move();
+
     }
 
     private void Move()
@@ -33,14 +37,14 @@ public class Player : Unit
         transform.Translate(dir * speed * Time.fixedDeltaTime);
     }
 
-    IEnumerator Shoot()
+    private IEnumerator Shoot()
     {
         WaitForSeconds wait = new WaitForSeconds(0.5f);
         while (true)
         {
             yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-            ObjectPool.Instance.OutObject(bullet, transform.position, Quaternion.identity);
- 
+            Debug.Log("´­¸§");
+            ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity);
         }
     }
 }

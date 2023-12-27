@@ -14,5 +14,6 @@ public class Unit : MonoBehaviour
 {
     [SerializeField] private StatesSet states;
     [SerializeField] protected float speed;
+    public LayerMask layer;
 
 }
