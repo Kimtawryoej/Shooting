@@ -43,7 +43,6 @@ public class Player : Unit
         while (true)
         {
             yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-            Debug.Log("´­¸§");
             ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity);
         }
     }

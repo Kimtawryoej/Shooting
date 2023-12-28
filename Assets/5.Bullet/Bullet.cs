@@ -2,28 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : SingleTone<Bullet>
 {
+    //플레이어가 레벨업 하면 옵저버 패턴으로 bullet공격력 up and 총알개수
     [SerializeField] private LayerMask layer;
+    public int Power { get; set; }
+
+    private void OnEnable()
+    {
+        StartCoroutine(Time());
+    }
+
     private void Start()
     {
-        StartCoroutine(Disappear());
+        Power = Player.Instance.UnitStat.AttackPower;
     }
 
     private void FixedUpdate()
     {
-        transform.Translate(Vector3.forward*0.5f);
+        transform.Translate(Vector3.forward * 0.5f);
     }
 
-    private IEnumerator Disappear()
+    IEnumerator Time() //타이머 스크립트 새로 만들어야함
     {
-        WaitForSeconds wait = new WaitForSeconds(3);
-        WaitUntil condition = new WaitUntil(() => gameObject.activeSelf);
-        while (true)
-        {
-            yield return condition;
-            yield return wait;
-            ObjectPool.Instance.InObject(layer, gameObject);
-        }
+        yield return new WaitForSeconds(3);
+        ObjectPool.Instance.InObject(layer, gameObject);
     }
 }

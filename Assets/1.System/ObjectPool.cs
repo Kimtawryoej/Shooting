@@ -33,7 +33,6 @@ public class ObjectPool : SingleTone<ObjectPool>
             bfInObj.SetActive(false);
             pool[prefab].Add(bfInObj);
         }
-
     }
 }
 

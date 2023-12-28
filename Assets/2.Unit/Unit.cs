@@ -73,25 +73,6 @@ public abstract class Unit : MonoBehaviour
     #endregion
 
     #region Hp
-    //public virtual void TakeDamage(int damageValue)
-    //{
-    //    ChangeHp(-damageValue);
-    //    HitEffect();
-    //    HitSound();
-
-    //    void HitEffect()
-    //    {
-    //        GameObject hitEffectSpawn = Instantiate(hitEffect);
-    //        Vector3 randomPos = transform.position + (Vector3)Random.insideUnitCircle * 0.5f;
-    //        hitEffectSpawn.transform.position = randomPos;
-    //    }
-
-    //    void HitSound()
-    //    {
-    //        SoundSystem.Instance.PlayFXSound(hitSound, 0.5f);
-    //    }
-    //}
-
     public virtual void SetHp(int healValue)
     {
         ChangeHp(healValue);
@@ -163,11 +144,13 @@ public abstract class Unit : MonoBehaviour
     #endregion
     protected virtual void Death()
     {
-        animator.SetBool("Death", true);
-        if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
-        {
-            gameObject.SetActive(false);
-        }
+        Debug.Log("Á×À½");
+        gameObject.SetActive(false);
+        //animator.SetBool("Death", true);
+        //if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
+        //{
+        //    gameObject.SetActive(false);
+        //}
     }
 
     public IEnumerator AniStop(string Aniname, string Aniset)
