@@ -4,35 +4,55 @@ using UnityEngine;
 
 public class Monster : Unit, I_ObseverManager
 {
+    [SerializeField] private GameObject bullet;
     [SerializeField] private GameObject monsterAppearPos;
     public GameObject MonsterAppearPos { get => monsterAppearPos; }
     public static Monster Instance;
     public List<I_Obsever> Obsevers = new List<I_Obsever>();
 
+    override protected void OnEnable()
+    {
+        ReSetStat();
+        GameManager.Instance.monster1 = gameObject; //타이머로 몇초뒤시작하게 해야함 그리고 지우셈
+        transform.rotation = GameManager.Instance.RotationCheck(layer);
+        StartCoroutine(Shoot1(bullet, unitStat.AttackPower, -0.5f));
+        //StartCoroutine(Shoot(() => , bullet, unitStat.AttackPower, -0.5f));
+    }
+
     override protected void Awake()
     {
         Instance = this;
     }
-
-
-    private void Start()
-    {
-        transform.rotation = GameManager.Instance.RotationCheck(layer);
-    }
+     
     private void FixedUpdate()
     {
         transform.Translate(Vector3.forward * unitStat.MoveSpeed);
     }
 
-
-    private void OnTriggerEnter(Collider other)
+    override protected void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Bullet bullet))
         {
-            ChangeHp(-bullet.Power);
+            if (bullet.Layer == LayerMask.GetMask("PlayerBullet"))
+            {
+                ChangeHp(-bullet.Power);
+                bullet.InObj();
+            }
         }
     }
-
+    #region 지워고 고쳐야할코드
+    protected IEnumerator Shoot1(GameObject bullet, int bulletPower, float bulletSpeed)
+    {
+        WaitForSeconds wait = new WaitForSeconds(1);
+        while (true)
+        {
+            yield return wait;
+            ObjectPool.Instance.OutObject(layer, bullet, transform.position, transform.rotation).gameObject.TryGetComponent(out Bullet bulletor);
+            bulletor.Power = bulletPower;
+            bulletor.Speed = bulletSpeed;
+        }
+    }
+    #endregion
     #region ObseverManager
     public void Add(I_Obsever obsever)
     {

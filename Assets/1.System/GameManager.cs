@@ -10,8 +10,8 @@ public class GameManager : SingleTone<GameManager>
     public Vector3 PlayerPos { get => Player.Instance.transform.position; }
 
     private int index = 0;
-    public Vector3 MonsterPos { get => monster1.transform.position; }
-    private GameObject monster1;
+    public Vector3 MonsterPos { get => MonsterPos; set => MonsterPos = value; }
+    public GameObject monster1 { get; set; }
 
     private Vector3 distance;
     private Quaternion rotation;
@@ -37,11 +37,11 @@ public class GameManager : SingleTone<GameManager>
     {
         if (layer == LayerMask.GetMask("Monster"))
         {
-            distance = PlayerPos - MonsterPos;
+            distance = PlayerPos - monster1.transform.position;
         }
         else
         {
-            distance = MonsterPos - PlayerPos;
+            distance = monster1.transform.position - PlayerPos;
         }
         rotation = Quaternion.LookRotation(distance.normalized);
         return rotation;

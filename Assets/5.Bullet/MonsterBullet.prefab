@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 6985696741688823421}
   - component: {fileID: 8948600070109826523}
   - component: {fileID: 7987169843129184717}
-  m_Layer: 3
-  m_Name: bullet
+  m_Layer: 9
+  m_Name: MonsterBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 7107516834756852035}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 2.19}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 7780faf9e1695d94bbe4de9d4da94235, type: 2}
+  - {fileID: 2100000, guid: 43e846d9af860864e8e2988b2825b0e3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -113,7 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   layer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 512
 --- !u!54 &7987169843129184717
 Rigidbody:
   m_ObjectHideFlags: 0

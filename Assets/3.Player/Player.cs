@@ -2,6 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct a
+{
+    public static int b;
+}
+
 public class Player : Unit
 {
     [SerializeField] private GameObject bullet;
@@ -10,7 +15,7 @@ public class Player : Unit
     private Vector3 dir = new Vector3(0, 0, 0);
     private GameObject SaveBullet;
     public static Player Instance;
-
+    a A;
     override protected void Awake()
     {
         Instance = this;
@@ -18,13 +23,13 @@ public class Player : Unit
 
     private void Start()
     {
-        StartCoroutine(Shoot());
+        StartCoroutine(Shoot(() => Input.GetKeyDown(KeyCode.Space), bullet, unitStat.AttackPower, 0.5f));
     }
 
     private void FixedUpdate()
     {
         Move();
-
+        
     }
 
     private void Move()
@@ -37,13 +42,15 @@ public class Player : Unit
         transform.Translate(dir * UnitStat.MoveSpeed * Time.fixedDeltaTime);
     }
 
-    private IEnumerator Shoot()
+    override protected void OnTriggerEnter(Collider other)
     {
-        WaitForSeconds wait = new WaitForSeconds(0.5f);
-        while (true)
+        if (other.gameObject.TryGetComponent(out Bullet bullet))
         {
-            yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
-            ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity);
+            if (bullet.Layer == LayerMask.GetMask("MonsterBullet"))
+            {
+                ChangeHp(-bullet.Power);
+                bullet.InObj();
+            }
         }
     }
 }

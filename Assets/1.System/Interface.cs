@@ -12,3 +12,4 @@ public interface I_ObseverManager
     public void Delete(I_Obsever obsever);
     public void NotifyObserver<T>(List<I_Obsever> obsevers, T value);
 }
+

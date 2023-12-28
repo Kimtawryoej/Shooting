@@ -42,6 +42,11 @@ public abstract class Unit : MonoBehaviour
     public Rigidbody2D Rigid => rigid;
     #endregion
 
+    protected virtual void OnEnable()
+    {
+        ReSetStat();
+    }
+
     protected virtual void Awake()
     {
         //spriteRenderer = GetComponent<SpriteRenderer>();
@@ -49,10 +54,7 @@ public abstract class Unit : MonoBehaviour
         //rigid = GetComponent<Rigidbody2D>();
     }
 
-    protected virtual void OnEnable()
-    {
-        ReSetStat();
-    }
+    protected abstract  void OnTriggerEnter(Collider other);
 
     #region ReSet
     protected void ReSetStat()
@@ -159,4 +161,19 @@ public abstract class Unit : MonoBehaviour
         animator.SetBool(Aniset, false);
         yield return new WaitForSeconds(2.5f);
     }
+
+    #region BulletAppear
+    protected IEnumerator Shoot(Func<bool>condition,GameObject bullet, int bulletPower, float bulletSpeed)
+    {
+        WaitForSeconds wait = new WaitForSeconds(0.5f);
+        WaitUntil until = new WaitUntil(condition);
+        while (true)
+        {
+            yield return until;
+            ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity).gameObject.TryGetComponent(out Bullet bulletor);
+            bulletor.Power = bulletPower;
+            bulletor.Speed = bulletSpeed;
+        }
+    }
+    #endregion
 }
