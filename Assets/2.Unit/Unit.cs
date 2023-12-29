@@ -20,8 +20,10 @@ public struct UnitStatInfo
 //[RequireComponent(typeof(Rigidbody2D))]
 public abstract class Unit : MonoBehaviour
 {
-    #region
+    #region º¯¼ö
     public LayerMask layer;
+
+    protected TimeAgent timeManager;
 
     [SerializeField] protected bool hitcheck;
     [SerializeField] protected UnitStatInfo unitStat;
@@ -54,7 +56,7 @@ public abstract class Unit : MonoBehaviour
         //rigid = GetComponent<Rigidbody2D>();
     }
 
-    protected abstract  void OnTriggerEnter(Collider other);
+    protected abstract void OnTriggerEnter(Collider other);
 
     #region ReSet
     protected void ReSetStat()
@@ -163,17 +165,12 @@ public abstract class Unit : MonoBehaviour
     }
 
     #region BulletAppear
-    protected IEnumerator Shoot(Func<bool>condition,GameObject bullet, int bulletPower, float bulletSpeed)
+
+    protected void Shoot(GameObject bullet, int bulletPower, float bulletSpeed)
     {
-        WaitForSeconds wait = new WaitForSeconds(0.5f);
-        WaitUntil until = new WaitUntil(condition);
-        while (true)
-        {
-            yield return until;
-            ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity).gameObject.TryGetComponent(out Bullet bulletor);
-            bulletor.Power = bulletPower;
-            bulletor.Speed = bulletSpeed;
-        }
+        ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity).gameObject.TryGetComponent(out Bullet bulletor);
+        bulletor.Power = bulletPower;
+        bulletor.Speed = bulletSpeed;
     }
     #endregion
 }

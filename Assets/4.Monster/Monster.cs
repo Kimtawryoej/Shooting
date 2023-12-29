@@ -5,17 +5,14 @@ using UnityEngine;
 public class Monster : Unit, I_ObseverManager
 {
     [SerializeField] private GameObject bullet;
-    [SerializeField] private GameObject monsterAppearPos;
-    public GameObject MonsterAppearPos { get => monsterAppearPos; }
     public static Monster Instance;
     public List<I_Obsever> Obsevers = new List<I_Obsever>();
 
     override protected void OnEnable()
     {
         ReSetStat();
-        GameManager.Instance.monster1 = gameObject; //타이머로 몇초뒤시작하게 해야함 그리고 지우셈
-        transform.rotation = GameManager.Instance.RotationCheck(layer);
-        StartCoroutine(Shoot1(bullet, unitStat.AttackPower, -0.5f));
+        
+        //StartCoroutine(Shoot1(bullet, unitStat.AttackPower, -0.5f));
         //StartCoroutine(Shoot(() => , bullet, unitStat.AttackPower, -0.5f));
     }
 
@@ -26,7 +23,7 @@ public class Monster : Unit, I_ObseverManager
      
     private void FixedUpdate()
     {
-        transform.Translate(Vector3.forward * unitStat.MoveSpeed);
+        transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
     }
 
     override protected void OnTriggerEnter(Collider other)
