@@ -166,9 +166,9 @@ public abstract class Unit : MonoBehaviour
 
     #region BulletAppear
 
-    protected void Shoot(GameObject bullet, int bulletPower, float bulletSpeed)
+    protected void Shoot(GameObject bullet, int bulletPower, float bulletSpeed,Quaternion rotation)
     {
-        ObjectPool.Instance.OutObject(layer, bullet, transform.position, Quaternion.identity).gameObject.TryGetComponent(out Bullet bulletor);
+        ObjectPool.Instance.OutObject(layer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
         bulletor.Power = bulletPower;
         bulletor.Speed = bulletSpeed;
     }

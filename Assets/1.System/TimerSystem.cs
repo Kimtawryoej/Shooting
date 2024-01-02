@@ -18,7 +18,6 @@ public class TimerSystem : SingleTone<TimerSystem>
     {
         if (timeAgentHashSet.Count > 0)
         {
-
             UpdateTimeAgent();
             DestroyTimeAgent();
         }
@@ -29,7 +28,7 @@ public class TimerSystem : SingleTone<TimerSystem>
         timeAgentHashSet.Add(timeAgent);
     }
 
-    private void UpdateTimeAgent() //조건이 안겹친다는 조건하에 잘 작동
+    private void UpdateTimeAgent() //함수 진행도중 timeAgentHashSet에 값이 추가되면 오류
     {
         foreach (var updateTimeAgent in timeAgentHashSet)
         {
@@ -48,6 +47,7 @@ public class TimerSystem : SingleTone<TimerSystem>
         {
             timeAgentHashSet.Remove(destroyTimeAgent);
             destroyTimeAgent.EndTimeAction?.Invoke(destroyTimeAgent);
+            destroyTimeAgent.TimeReset();
         }
         destroyTimeAgentHashSet.Clear();
     }
@@ -71,6 +71,10 @@ public class TimeAgent
 
     public bool IsTimeUp => CurrentTime >= timerTime;
 
+    public void TimeReset()
+    {
+        CurrentTime = 0;
+    }
     public void AddTime(float time)
     {
         CurrentTime += time;

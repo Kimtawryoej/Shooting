@@ -11,19 +11,18 @@ public class Monster : Unit, I_ObseverManager
     override protected void OnEnable()
     {
         ReSetStat();
-        
-        //StartCoroutine(Shoot1(bullet, unitStat.AttackPower, -0.5f));
-        //StartCoroutine(Shoot(() => , bullet, unitStat.AttackPower, -0.5f));
     }
 
     override protected void Awake()
     {
         Instance = this;
+        timeManager = new TimeAgent(1, (TimeAgent) => { }, (TimeAgent) => Shoot(bullet, unitStat.AttackPower, 0.5f, gameObject.transform.rotation));
     }
      
     private void FixedUpdate()
     {
         transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
+        TimerSystem.Instance.AddTimer(timeManager);
     }
 
     override protected void OnTriggerEnter(Collider other)
@@ -37,19 +36,7 @@ public class Monster : Unit, I_ObseverManager
             }
         }
     }
-    #region 지워고 고쳐야할코드
-    protected IEnumerator Shoot1(GameObject bullet, int bulletPower, float bulletSpeed)
-    {
-        WaitForSeconds wait = new WaitForSeconds(1);
-        while (true)
-        {
-            yield return wait;
-            ObjectPool.Instance.OutObject(layer, bullet, transform.position, transform.rotation).gameObject.TryGetComponent(out Bullet bulletor);
-            bulletor.Power = bulletPower;
-            bulletor.Speed = bulletSpeed;
-        }
-    }
-    #endregion
+
     #region ObseverManager
     public void Add(I_Obsever obsever)
     {

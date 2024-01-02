@@ -10,15 +10,16 @@ public class Player : Unit
     private float z;
     private Vector3 dir = new Vector3(0, 0, 0);
     public static Player Instance;
-
+    private bool check = true;
     override protected void Awake()
     {
         Instance = this;
+        //timeManager = new TimeAgent(0.5f, (TimeAgent) => Debug.Log("시작"), (TimeAgent) => Debug.Log("끝"));
     }
 
     private void Start()
     {
-        timeManager = new TimeAgent(0.5f, (TimeAgent) => Debug.Log("총알생성"), (TimeAgent) => Shoot(bullet, unitStat.AttackPower, 0.5f));
+        timeManager = new TimeAgent(0.5f, (TimeAgent) => { if (check) { Shoot(bullet, unitStat.AttackPower, 0.5f, Quaternion.identity); check = false; } }, (TimeAgent) => check = true);
     }
 
     private void Update()
@@ -54,5 +55,10 @@ public class Player : Unit
                 bullet.InObj();
             }
         }
+    }
+
+    private bool ShootCheck(bool check)
+    {
+        return check;
     }
 }

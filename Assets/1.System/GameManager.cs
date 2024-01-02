@@ -2,10 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct TimeManager
-{
-    public TimeAgent timeManager05;
-}
+
 public class GameManager : SingleTone<GameManager>
 {
     #region Monster변수
@@ -26,12 +23,10 @@ public class GameManager : SingleTone<GameManager>
     #endregion
 
     #region Timer변수
-    public TimeManager Time;
     #endregion
 
     private void Start()
     {
-        TimeSet();
         StartCoroutine(MonsterAppear());
     }
 
@@ -62,8 +57,5 @@ public class GameManager : SingleTone<GameManager>
         return rotation;
     }
 
-    private void TimeSet()
-    {
-        Time.timeManager05 = new TimeAgent(0.5f, (TimeAgent) => Debug.Log("끝"), (TimeAgent) => Debug.Log("끝"));
-    }
+
 }

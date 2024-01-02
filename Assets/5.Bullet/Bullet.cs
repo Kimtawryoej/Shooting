@@ -9,9 +9,15 @@ public class Bullet : SingleTone<Bullet>
     public LayerMask Layer { get => layer; }
     public int Power { get; set; }
     public float Speed { get; set; }
+    protected TimeAgent timeManager;
+
+    override public void Awake()
+    {
+        timeManager = new TimeAgent(3, (TimeAgent) => { }, (TimeAgent) => InObj());
+    }
     private void OnEnable()
     {
-        StartCoroutine(Time());
+        TimerSystem.Instance.AddTimer(timeManager);
     }
 
     private void Start()
@@ -23,11 +29,7 @@ public class Bullet : SingleTone<Bullet>
         transform.Translate(Vector3.forward * Speed);
     }
 
-    IEnumerator Time() //타이머 스크립트 새로 만들어야함
-    {
-        yield return new WaitForSeconds(3);
-        InObj();
-    }
+
 
     public void InObj()
     {
