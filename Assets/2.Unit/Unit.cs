@@ -21,7 +21,7 @@ public struct UnitStatInfo
 public abstract class Unit : MonoBehaviour
 {
     #region º¯¼ö
-    public LayerMask layer;
+    public LayerMask ObjectLayer;
 
     protected TimeAgent timeManager;
 
@@ -168,7 +168,7 @@ public abstract class Unit : MonoBehaviour
 
     protected void Shoot(GameObject bullet, int bulletPower, float bulletSpeed,Quaternion rotation)
     {
-        ObjectPool.Instance.OutObject(layer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
+        ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
         bulletor.Power = bulletPower;
         bulletor.Speed = bulletSpeed;
     }

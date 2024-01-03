@@ -25,6 +25,10 @@ public class GameManager : SingleTone<GameManager>
     #region Timer변수
     #endregion
 
+    #region 레벨
+    public int Leavel { get; set;}
+    #endregion
+
     private void Start()
     {
         StartCoroutine(MonsterAppear());
@@ -38,7 +42,7 @@ public class GameManager : SingleTone<GameManager>
         {
             yield return wait;
             MonsterType[0].TryGetComponent(out Monster monster);
-            ObjectPool.Instance.OutObject(monster.layer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(monster.layer));
+            ObjectPool.Instance.OutObject(monster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(monster.ObjectLayer));
         }
     }
 

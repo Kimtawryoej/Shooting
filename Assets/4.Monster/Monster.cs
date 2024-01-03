@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Monster : Unit, I_ObseverManager
 {
     [SerializeField] private GameObject bullet;
     public static Monster Instance;
-    public List<I_Obsever> Obsevers = new List<I_Obsever>();
-
+    private List<I_Obsever> Obsevers = new List<I_Obsever>();
+    [SerializeField] private LayerMask MonsterType;
+    private int typeLayer;
     override protected void OnEnable()
     {
         ReSetStat();
@@ -15,10 +17,13 @@ public class Monster : Unit, I_ObseverManager
 
     override protected void Awake()
     {
+        Debug.Log(MonsterType.GetType());
+        typeLayer = (1 << 10) | (1 << 11);
+        Debug.Log(typeLayer);
         Instance = this;
         timeManager = new TimeAgent(1, (TimeAgent) => { }, (TimeAgent) => Shoot(bullet, unitStat.AttackPower, 0.5f, gameObject.transform.rotation));
     }
-     
+
     private void FixedUpdate()
     {
         transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
@@ -36,6 +41,8 @@ public class Monster : Unit, I_ObseverManager
             }
         }
     }
+
+
 
     #region ObseverManager
     public void Add(I_Obsever obsever)
@@ -55,3 +62,28 @@ public class Monster : Unit, I_ObseverManager
     }
     #endregion
 }
+class TypesAction : MonoBehaviour
+{
+    private LayerMask MonsterType;
+    private UnitStatInfo unitStat;
+    private Quaternion rotation;
+    private Action StopMonster;
+    private Dictionary<LayerMask, Action> Actions;
+
+    TypesAction(LayerMask MonsterType, UnitStatInfo unitStat, Quaternion rotation)
+    {
+        this.MonsterType = MonsterType;
+        this.unitStat = unitStat;
+        this.rotation = rotation;
+    }
+
+    //public void ActionSet()
+    //{
+    //    Actions = new Dictionary<LayerMask, Action>()
+    //    {
+    //        {(1<<10),()=>}
+    //    };
+    //}
+
+}
+

@@ -112,7 +112,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a1e4671ac8771f488bbf55463f379c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  layer:
+  ObjectLayer:
     serializedVersion: 2
     m_Bits: 64
   hitcheck: 0
@@ -126,7 +126,9 @@ MonoBehaviour:
   currentHp: 0
   animator: {fileID: 0}
   bullet: {fileID: 7107516834756852035, guid: 8c73d4fb92051dc42974c0be96719cf8, type: 3}
-  monsterAppearPos: {fileID: 4336680816923538056, guid: 9bb0691f0f99dd248bf73c97e90d75f0, type: 3}
+  MonsterType:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!54 &-231379372635165974
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -15,9 +15,9 @@ TagManager:
   - Player
   - PlayerBullet
   - MonsterBullet
-  - 
-  - 
-  - 
+  - StopMonster
+  - MoveMonster
+  - 3BulletMonster
   - 
   - 
   - 

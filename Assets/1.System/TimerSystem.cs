@@ -5,8 +5,9 @@ using System;
 
 public class TimerSystem : SingleTone<TimerSystem>
 {
-    private HashSet<TimeAgent> timeAgentHashSet = new();
-    private HashSet<TimeAgent> destroyTimeAgentHashSet = new();
+
+    private List<TimeAgent> timeAgentHashSet = new();//LinkedList,Hash성능차이
+    private List<TimeAgent> destroyTimeAgentHashSet = new();
 
     private void Update()
     {
@@ -25,18 +26,19 @@ public class TimerSystem : SingleTone<TimerSystem>
 
     public void AddTimer(TimeAgent timeAgent)
     {
-        timeAgentHashSet.Add(timeAgent);
+        if(SameCheck<TimeAgent>(timeAgentHashSet,timeAgent))
+            timeAgentHashSet.Add(timeAgent);
     }
 
-    private void UpdateTimeAgent() //함수 진행도중 timeAgentHashSet에 값이 추가되면 오류
+    private void UpdateTimeAgent() //함수 진행도중 timeAgentHashSet에 값이 추가되면 오류 => foreach문 for문으로 바꿔서 해결
     {
-        foreach (var updateTimeAgent in timeAgentHashSet)
+        for(int i= 0; i< timeAgentHashSet.Count; i++)
         {
-            updateTimeAgent.AddTime(Time.deltaTime);
-            updateTimeAgent.UpdateTimeAction?.Invoke(updateTimeAgent);
-            if (updateTimeAgent.IsTimeUp)
+            timeAgentHashSet[i].AddTime(Time.deltaTime);
+            timeAgentHashSet[i].UpdateTimeAction?.Invoke(timeAgentHashSet[i]);
+            if (timeAgentHashSet[i].IsTimeUp)
             {
-                destroyTimeAgentHashSet.Add(updateTimeAgent);
+                destroyTimeAgentHashSet.Add(timeAgentHashSet[i]);
             }
         }
     }
@@ -50,6 +52,16 @@ public class TimerSystem : SingleTone<TimerSystem>
             destroyTimeAgent.TimeReset();
         }
         destroyTimeAgentHashSet.Clear();
+    }
+
+    private bool SameCheck<T>(List<T> list, T sameObjecrt)
+    {
+        bool check = true;
+        if (list.Contains(sameObjecrt))
+            check = false;
+        else
+            check = true;
+        return check;
     }
 }
 
