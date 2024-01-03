@@ -129,6 +129,7 @@ MonoBehaviour:
   MonsterType:
     serializedVersion: 2
     m_Bits: 1024
+  MonsterAction: {fileID: 0}
 --- !u!54 &-231379372635165974
 Rigidbody:
   m_ObjectHideFlags: 0

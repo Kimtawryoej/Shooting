@@ -11,6 +11,7 @@ public class GameManager : SingleTone<GameManager>
     private int index = 0;
     public Vector3 MonsterPos { get => MonsterPos; set => MonsterPos = value; }
     [SerializeField] private GameObject monsterAppearPos;
+    public GameObject MonsterAppearPos { get { return  monsterAppearPos; } }
     #endregion
 
     #region Playerº¯¼ö
