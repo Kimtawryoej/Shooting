@@ -585,7 +585,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ObjectLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 256
   hitcheck: 0
   unitStat:
     MaxHp: 10

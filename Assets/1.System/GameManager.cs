@@ -47,6 +47,8 @@ public class GameManager : SingleTone<GameManager>
         }
     }
 
+
+
     public Quaternion RotationCheck(LayerMask layer) //layer비트연산
     {
         if (layer == LayerMask.GetMask("Monster"))

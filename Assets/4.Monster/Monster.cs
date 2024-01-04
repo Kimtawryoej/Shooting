@@ -29,12 +29,10 @@ public class Monster : Unit, I_ObseverManager
     override protected void OnEnable()
     {
         ReSetStat();
-    }
-
-    private void Start()
-    {
         MonsterAction.GetValue();
     }
+
+    
     private void FixedUpdate()
     {
         
@@ -84,7 +82,7 @@ public class TypesAction : MonoBehaviour
     private Dictionary<int, Action> Actions;
     private Vector3[] SaveEndPos = { new Vector3(-11, 0, 3.115f), new Vector3(1, 0, 3.115f), new Vector3(11, 0, 3.115f) };
     private static HashSet<Vector3> EndPos = new HashSet<Vector3>();
-    private bool check = true;
+
     public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation,GameObject myObject)
     {
         this.MonsterType = MonsterType;
@@ -126,8 +124,13 @@ public class TypesAction : MonoBehaviour
         }
         for (float i = 0; i <= 1; i += Time.deltaTime*0.05f)
         {
-            Debug.Log(i);
+            float j = 0;
+            while(j<Time.deltaTime*2)
+            {
+                j += Time.deltaTime;
+            }
             myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), i);
+            Debug.Log("ÀÌµ¿");
         }
         if(SaveEndPos.Last().Equals(EndPos.Last()))
         {

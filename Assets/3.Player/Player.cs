@@ -35,6 +35,7 @@ public class Player : Unit
         Move();
     }
 
+
     private void Move()
     {
         x = Input.GetAxisRaw("Horizontal");
