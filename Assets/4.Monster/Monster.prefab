@@ -128,8 +128,7 @@ MonoBehaviour:
   bullet: {fileID: 7107516834756852035, guid: 8c73d4fb92051dc42974c0be96719cf8, type: 3}
   MonsterType:
     serializedVersion: 2
-    m_Bits: 1024
-  MonsterAction: {fileID: 0}
+    m_Bits: 5120
 --- !u!54 &-231379372635165974
 Rigidbody:
   m_ObjectHideFlags: 0

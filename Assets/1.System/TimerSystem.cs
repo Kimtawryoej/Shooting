@@ -34,7 +34,7 @@ public class TimerSystem : SingleTone<TimerSystem>
     {
         for(int i= 0; i< timeAgentHashSet.Count; i++)
         {
-            timeAgentHashSet[i].AddTime(Time.deltaTime);
+            timeAgentHashSet[i].AddTime();
             timeAgentHashSet[i].UpdateTimeAction?.Invoke(timeAgentHashSet[i]);
             if (timeAgentHashSet[i].IsTimeUp)
             {
@@ -61,7 +61,7 @@ public class TimerSystem : SingleTone<TimerSystem>
             check = false;
         else
             check = true;
-        return check;
+        return check; 
     }
 }
 
@@ -70,15 +70,16 @@ public class TimeAgent
     public float CurrentTime { get; private set; }
     private readonly float timerTime;
     public float TimerTime => timerTime;
-
+    private float plusTime;
     public Action<TimeAgent> UpdateTimeAction { get; set; }
     public Action<TimeAgent> EndTimeAction { get; set; }
 
-    public TimeAgent(float time, Action<TimeAgent> updateTimeAction = default, Action<TimeAgent> endTimeAction = default)
+    public TimeAgent(float time,float plusTime,Action<TimeAgent> updateTimeAction = default, Action<TimeAgent> endTimeAction = default)
     {
         this.timerTime = time;
         UpdateTimeAction = updateTimeAction;
         EndTimeAction = endTimeAction;
+        this.plusTime = plusTime;
     }
 
     public bool IsTimeUp => CurrentTime >= timerTime;
@@ -87,8 +88,8 @@ public class TimeAgent
     {
         CurrentTime = 0;
     }
-    public void AddTime(float time)
+    public void AddTime()
     {
-        CurrentTime += time;
+        CurrentTime += plusTime;
     }
 }

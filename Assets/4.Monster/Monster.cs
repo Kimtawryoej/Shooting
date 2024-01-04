@@ -8,39 +8,44 @@ using System.Linq;
 public class Monster : Unit, I_ObseverManager
 {
     [SerializeField] private GameObject bullet;
+    public GameObject Bullet { get => bullet; }
     public static Monster Instance;
     private List<I_Obsever> Obsevers = new List<I_Obsever>();
     #region Layer변수
     [SerializeField] private LayerMask MonsterType;
     private BitArray MonsterTypeBit;
     #endregion
-    public TypesAction MonsterAction;
+    private TypesAction MonsterAction;
     private TimeAgent timeNull;
 
     //왜 함수 밖에서는 매개변수를 불러올수 없음?
     override protected void Awake()
     {
+        #region ActionsSet
         MonsterTypeBit = new BitArray(new int[] { MonsterType.value.ConvertTo<int>() });
-        MonsterAction = new TypesAction(MonsterTypeBit, unitStat, transform.rotation,gameObject);
-        MonsterAction.ActionSet();
+        MonsterAction = new TypesAction(MonsterTypeBit, unitStat, transform.rotation, this);
+        MonsterAction.Set();
+        #endregion
         Instance = this;
-        timeManager = new TimeAgent(1, (TimeAgent) => { }, (TimeAgent) => Shoot(bullet, unitStat.AttackPower, 0.5f, gameObject.transform.rotation));
+
     }
     override protected void OnEnable()
     {
         ReSetStat();
+
+    }
+
+    private void Start()
+    {
         MonsterAction.GetValue();
     }
 
-    
     private void FixedUpdate()
     {
-        
-        //transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
+
+
         TimerSystem.Instance.AddTimer(timeManager);
     }
-
-   
     override protected void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Bullet bullet))
@@ -52,8 +57,6 @@ public class Monster : Unit, I_ObseverManager
             }
         }
     }
-
-
 
     #region ObseverManager
     public void Add(I_Obsever obsever)
@@ -78,12 +81,19 @@ public class TypesAction : MonoBehaviour
     private BitArray MonsterType;
     private UnitStatInfo unitStat;
     private Quaternion rotation;
-    private GameObject myObject;
+    private Monster myObject;
+
     private Dictionary<int, Action> Actions;
+
     private Vector3[] SaveEndPos = { new Vector3(-11, 0, 3.115f), new Vector3(1, 0, 3.115f), new Vector3(11, 0, 3.115f) };
     private static HashSet<Vector3> EndPos = new HashSet<Vector3>();
-
-    public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation,GameObject myObject)
+    #region 타이머
+    private TimeAgent MoveTimeManager;
+    private TimeAgent WaitTimeManager;
+    private TimeAgent BulletTimeManagerCount;
+    private TimeAgent BulletTimeManager;
+    #endregion
+    public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation, Monster myObject)
     {
         this.MonsterType = MonsterType;
         this.unitStat = unitStat;
@@ -91,13 +101,21 @@ public class TypesAction : MonoBehaviour
         this.myObject = myObject;
     }
 
-    public void ActionSet()
+    public void Set()
     {
+        MoveTimeManager = new TimeAgent(10, Time.deltaTime, (TimeAgent) => { myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed); }, (TimeAgent) => { });
+
+        WaitTimeManager = new TimeAgent(1, Time.deltaTime, (TimeAgent) => { myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), WaitTimeManager.CurrentTime); }, (TimeAgent) => { if (SaveEndPos.Last().Equals(EndPos.Last())) { EndPos.Clear(); } });
+
+        BulletTimeManagerCount = new TimeAgent(10, 1, (TimeAgent) => { TimerSystem.Instance.AddTimer(BulletTimeManager); }, (TimeAgent) => { });
+        BulletTimeManager = new TimeAgent(Time.deltaTime, Time.deltaTime, (TimeAgent) => { myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation); }, (TimeAgent) => { });
+
         Actions = new Dictionary<int, Action>()
         {
             {10,()=>{StopMove(); } },
-            {11,()=>{Debug.Log("11");} },
-            {12,()=>{Debug.Log("12");} },
+            {11,()=>{ Move(); } },
+            {12,()=>{PlayerAngleShoot(); } },
+            {13,()=>{Debug.Log("13");} }
         };
     }
 
@@ -112,6 +130,12 @@ public class TypesAction : MonoBehaviour
         }
     }
 
+    #region ActionMethods
+    public void Move()
+    {
+        TimerSystem.Instance.AddTimer(MoveTimeManager);
+    }
+
     public void StopMove()
     {
         foreach (Vector3 item in SaveEndPos)
@@ -122,20 +146,13 @@ public class TypesAction : MonoBehaviour
                 break;
             }
         }
-        for (float i = 0; i <= 1; i += Time.deltaTime*0.05f)
-        {
-            float j = 0;
-            while(j<Time.deltaTime*2)
-            {
-                j += Time.deltaTime;
-            }
-            myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), i);
-            Debug.Log("이동");
-        }
-        if(SaveEndPos.Last().Equals(EndPos.Last()))
-        {
-            EndPos.Clear();
-        }
+        TimerSystem.Instance.AddTimer(WaitTimeManager);
     }
+
+    public void PlayerAngleShoot()
+    {
+        TimerSystem.Instance.AddTimer(BulletTimeManagerCount);
+    }
+    #endregion
 }
 
