@@ -19,7 +19,7 @@ public class Player : Unit
 
     private void Start()
     {
-        timeManager = new TimeAgent(0.5f, Time.deltaTime, (TimeAgent) => { if (check) { Shoot(bullet, unitStat.AttackPower, 0.5f, Quaternion.identity); check = false; } }, (TimeAgent) => check = true);
+        timeManager = new TimeAgent(0.5f, (TimeAgent) => { if (check) { Shoot(bullet, unitStat.AttackPower, 0.5f, Quaternion.identity); check = false; } }, (TimeAgent) => check = true);
     }
 
     private void Update()

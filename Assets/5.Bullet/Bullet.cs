@@ -13,7 +13,7 @@ public class Bullet : SingleTone<Bullet>
 
     override public void Awake()
     {
-        timeManager = new TimeAgent(3, Time.deltaTime, (TimeAgent) => { }, (TimeAgent) => InObj());
+        timeManager = new TimeAgent(3, (TimeAgent) => { }, (TimeAgent) => InObj());
     }
     private void OnEnable()
     {

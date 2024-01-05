@@ -7,7 +7,7 @@ public class TimerSystem : SingleTone<TimerSystem>
 {
 
     private List<TimeAgent> timeAgentHashSet = new();//LinkedList,Hash성능차이
-    private List<TimeAgent> destroyTimeAgentHashSet = new();
+    private List<TimeAgent> destroyTimeAgentHashSet = new(); 
 
     private void Update()
     {
@@ -34,7 +34,7 @@ public class TimerSystem : SingleTone<TimerSystem>
     {
         for(int i= 0; i< timeAgentHashSet.Count; i++)
         {
-            timeAgentHashSet[i].AddTime();
+            timeAgentHashSet[i].AddTime(Time.deltaTime);
             timeAgentHashSet[i].UpdateTimeAction?.Invoke(timeAgentHashSet[i]);
             if (timeAgentHashSet[i].IsTimeUp)
             {
@@ -63,6 +63,15 @@ public class TimerSystem : SingleTone<TimerSystem>
             check = true;
         return check; 
     }
+
+    public void motivation(float time)
+    {
+        float currentTime = 0;
+        while(currentTime<=time)
+        {
+            currentTime += Time.deltaTime;
+        }
+    }
 }
 
 public class TimeAgent
@@ -70,16 +79,14 @@ public class TimeAgent
     public float CurrentTime { get; private set; }
     private readonly float timerTime;
     public float TimerTime => timerTime;
-    private float plusTime;
     public Action<TimeAgent> UpdateTimeAction { get; set; }
     public Action<TimeAgent> EndTimeAction { get; set; }
 
-    public TimeAgent(float time,float plusTime,Action<TimeAgent> updateTimeAction = default, Action<TimeAgent> endTimeAction = default)
+    public TimeAgent(float time,Action<TimeAgent> updateTimeAction = default, Action<TimeAgent> endTimeAction = default)
     {
         this.timerTime = time;
         UpdateTimeAction = updateTimeAction;
         EndTimeAction = endTimeAction;
-        this.plusTime = plusTime;
     }
 
     public bool IsTimeUp => CurrentTime >= timerTime;
@@ -88,8 +95,8 @@ public class TimeAgent
     {
         CurrentTime = 0;
     }
-    public void AddTime()
+    public void AddTime(float time)
     {
-        CurrentTime += plusTime;
+        CurrentTime += time;
     }
 }

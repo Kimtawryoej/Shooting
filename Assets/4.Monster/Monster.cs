@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -103,13 +104,11 @@ public class TypesAction : MonoBehaviour
 
     public void Set()
     {
-        MoveTimeManager = new TimeAgent(10, Time.deltaTime, (TimeAgent) => { myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed); }, (TimeAgent) => { });
+        MoveTimeManager = new TimeAgent(10, (TimeAgent) => { myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed); }, (TimeAgent) => { });
 
-        WaitTimeManager = new TimeAgent(1, Time.deltaTime, (TimeAgent) => { myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), WaitTimeManager.CurrentTime); }, (TimeAgent) => { if (SaveEndPos.Last().Equals(EndPos.Last())) { EndPos.Clear(); } });
+        WaitTimeManager = new TimeAgent(1, (TimeAgent) => { myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), WaitTimeManager.CurrentTime); }, (TimeAgent) => { if (SaveEndPos.Last().Equals(EndPos.Last())) { EndPos.Clear(); } });
 
-        BulletTimeManagerCount = new TimeAgent(10, 1, (TimeAgent) => { TimerSystem.Instance.AddTimer(BulletTimeManager); }, (TimeAgent) => { });
-        BulletTimeManager = new TimeAgent(Time.deltaTime, Time.deltaTime, (TimeAgent) => { myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation); }, (TimeAgent) => { });
-
+        //BulletTimeManagerCount = new TimeAgent(Ti, 1, (TimeAgent) => {  }, (TimeAgent) => { );
         Actions = new Dictionary<int, Action>()
         {
             {10,()=>{StopMove(); } },
@@ -151,7 +150,11 @@ public class TypesAction : MonoBehaviour
 
     public void PlayerAngleShoot()
     {
-        TimerSystem.Instance.AddTimer(BulletTimeManagerCount);
+        for (int i = 0; i < 10; i++)
+        {
+            myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation);
+            TimerSystem.Instance.motivation(1);
+        }
     }
     #endregion
 }
