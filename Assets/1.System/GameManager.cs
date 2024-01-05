@@ -11,7 +11,9 @@ public class GameManager : SingleTone<GameManager>
     private int index = 0;
     public Vector3 MonsterPos { get => MonsterPos; set => MonsterPos = value; }
     [SerializeField] private GameObject monsterAppearPos;
-    public GameObject MonsterAppearPos { get { return  monsterAppearPos; } }
+    public GameObject MonsterAppearPos { get { return monsterAppearPos; } }
+    
+    private GameObject PoolMonster;
     #endregion
 
     #region Player변수
@@ -27,12 +29,13 @@ public class GameManager : SingleTone<GameManager>
     #endregion
 
     #region 레벨
-    public int Leavel { get; set;}
+    public int Leavel { get; set; }
     #endregion
 
     private void Start()
     {
         StartCoroutine(MonsterAppear());
+        
     }
 
     private IEnumerator MonsterAppear()
@@ -43,7 +46,7 @@ public class GameManager : SingleTone<GameManager>
         {
             yield return wait;
             MonsterType[0].TryGetComponent(out Monster monster);
-            ObjectPool.Instance.OutObject(monster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(monster.ObjectLayer));
+            PoolMonster = ObjectPool.Instance.OutObject(monster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(monster.ObjectLayer));
         }
     }
 
@@ -64,5 +67,5 @@ public class GameManager : SingleTone<GameManager>
         return rotation;
     }
 
-
+   
 }

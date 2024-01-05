@@ -1,4 +1,3 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +15,8 @@ public class Monster : Unit, I_ObseverManager
     [SerializeField] private LayerMask MonsterType;
     private BitArray MonsterTypeBit;
     #endregion
-    private TypesAction MonsterAction;
+    private TypesAction monsterAction;
+    public TypesAction MonsterAction { get => monsterAction; }
     private TimeAgent timeNull;
 
     //왜 함수 밖에서는 매개변수를 불러올수 없음?
@@ -24,28 +24,25 @@ public class Monster : Unit, I_ObseverManager
     {
         #region ActionsSet
         MonsterTypeBit = new BitArray(new int[] { MonsterType.value.ConvertTo<int>() });
-        MonsterAction = new TypesAction(MonsterTypeBit, unitStat, transform.rotation, this);
-        MonsterAction.Set();
+        monsterAction = new TypesAction(MonsterTypeBit, unitStat, transform.rotation, this);
+        monsterAction.Set();
         #endregion
         Instance = this;
-
     }
     override protected void OnEnable()
     {
         ReSetStat();
-
+        StartCoroutine(MonsterAction.GetValue());
     }
 
     private void Start()
     {
-        MonsterAction.GetValue();
+
     }
 
     private void FixedUpdate()
     {
 
-
-        TimerSystem.Instance.AddTimer(timeManager);
     }
     override protected void OnTriggerEnter(Collider other)
     {
@@ -58,6 +55,7 @@ public class Monster : Unit, I_ObseverManager
             }
         }
     }
+
 
     #region ObseverManager
     public void Add(I_Obsever obsever)
@@ -77,6 +75,7 @@ public class Monster : Unit, I_ObseverManager
     }
     #endregion
 }
+
 public class TypesAction : MonoBehaviour
 {
     private BitArray MonsterType;
@@ -84,15 +83,12 @@ public class TypesAction : MonoBehaviour
     private Quaternion rotation;
     private Monster myObject;
 
-    private Dictionary<int, Action> Actions;
+    private Dictionary<int, IEnumerator> Actions;
 
     private Vector3[] SaveEndPos = { new Vector3(-11, 0, 3.115f), new Vector3(1, 0, 3.115f), new Vector3(11, 0, 3.115f) };
     private static HashSet<Vector3> EndPos = new HashSet<Vector3>();
     #region 타이머
-    private TimeAgent MoveTimeManager;
     private TimeAgent WaitTimeManager;
-    private TimeAgent BulletTimeManagerCount;
-    private TimeAgent BulletTimeManager;
     #endregion
     public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation, Monster myObject)
     {
@@ -104,38 +100,50 @@ public class TypesAction : MonoBehaviour
 
     public void Set()
     {
-        MoveTimeManager = new TimeAgent(10, (TimeAgent) => { myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed); }, (TimeAgent) => { });
 
         WaitTimeManager = new TimeAgent(1, (TimeAgent) => { myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), WaitTimeManager.CurrentTime); }, (TimeAgent) => { if (SaveEndPos.Last().Equals(EndPos.Last())) { EndPos.Clear(); } });
 
-        //BulletTimeManagerCount = new TimeAgent(Ti, 1, (TimeAgent) => {  }, (TimeAgent) => { );
-        Actions = new Dictionary<int, Action>()
+        Actions = new Dictionary<int, IEnumerator>()
         {
-            {10,()=>{StopMove(); } },
-            {11,()=>{ Move(); } },
-            {12,()=>{PlayerAngleShoot(); } },
-            {13,()=>{Debug.Log("13");} }
+            {10,StopMove()},
+            {11,Move()},
+            {12,PlayerAngleShoot()},
+            //{13,()=>{Debug.Log("13")}
         };
     }
 
-    public void GetValue()
+    public IEnumerator GetValue()
     {
-        foreach (var item in Actions)
+        while (true)
         {
-            if (MonsterType[item.Key].Equals(true))
+            for (int i = 0; i < MonsterType.Count; i++)
             {
-                item.Value();
+                if (MonsterType[i].Equals(true))
+                {
+                    yield return Actions[i];
+                    if(Actions.ContainsValue(PlayerAngleShoot()))
+                    {
+                        Debug.Log("있음");
+                    }
+                    //Debug.Log("실행중2");
+                }
             }
+            //yield return PlayerAngleShoot();
+            //yield return Actions[12];
+            //Debug.Log("end");
         }
     }
 
     #region ActionMethods
-    public void Move()
+    private IEnumerator Move()
     {
-        TimerSystem.Instance.AddTimer(MoveTimeManager);
+        Debug.Log("움직여라");
+        myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
+        yield return null;
+
     }
 
-    public void StopMove()
+    private IEnumerator StopMove()
     {
         foreach (Vector3 item in SaveEndPos)
         {
@@ -146,16 +154,15 @@ public class TypesAction : MonoBehaviour
             }
         }
         TimerSystem.Instance.AddTimer(WaitTimeManager);
+        yield return null;
     }
 
-    public void PlayerAngleShoot()
+
+    private IEnumerator PlayerAngleShoot()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation);
-            TimerSystem.Instance.motivation(1);
-        }
+        Debug.Log("쏴라");
+        myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation);
+        yield return new WaitForSeconds(1);
     }
     #endregion
 }
-

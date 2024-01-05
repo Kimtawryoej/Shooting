@@ -27,7 +27,10 @@ public class TimerSystem : SingleTone<TimerSystem>
     public void AddTimer(TimeAgent timeAgent)
     {
         if(SameCheck<TimeAgent>(timeAgentHashSet,timeAgent))
+        {
             timeAgentHashSet.Add(timeAgent);
+            
+        }
     }
 
     private void UpdateTimeAgent() //함수 진행도중 timeAgentHashSet에 값이 추가되면 오류 => foreach문 for문으로 바꿔서 해결
