@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -9,11 +10,9 @@ public class GameManager : SingleTone<GameManager>
     [SerializeField] private List<GameObject> monsterType = new List<GameObject>();
     public List<GameObject> MonsterType { get => monsterType; } //**
     private int index = 0;
-    public Vector3 MonsterPos { get => MonsterPos; set => MonsterPos = value; }
+
     [SerializeField] private GameObject monsterAppearPos;
     public GameObject MonsterAppearPos { get { return monsterAppearPos; } }
-    
-    private GameObject PoolMonster;
     #endregion
 
     #region Player변수
@@ -25,9 +24,6 @@ public class GameManager : SingleTone<GameManager>
     private Quaternion rotation;
     #endregion
 
-    #region Timer변수
-    #endregion
-
     #region 레벨
     public int Leavel { get; set; }
     #endregion
@@ -35,29 +31,52 @@ public class GameManager : SingleTone<GameManager>
     private void Start()
     {
         StartCoroutine(MonsterAppear());
-        
     }
 
+    #region 몬스터 생성
     private IEnumerator MonsterAppear()
     {
-        WaitForSeconds wait = new WaitForSeconds(7);
+        WaitForSeconds wait = new WaitForSeconds(2);
 
         while (true)
         {
             yield return wait;
-            MonsterType[0].TryGetComponent(out Monster monster);
-            PoolMonster = ObjectPool.Instance.OutObject(monster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(monster.ObjectLayer));
+            switch (index)
+            {
+                case 0:
+                    MonsterType[index].TryGetComponent(out Monster Movemonster);
+                    ObjectPool.Instance.OutObject(Movemonster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, RotationCheck(Movemonster.gameObject.layer)); break;
+                case 1:
+                    MonsterType[index].TryGetComponent(out Monster Stopmonster);
+                    ObjectPool.Instance.OutObject(Stopmonster.ObjectLayer, MonsterType[0], monsterAppearPos.transform.position, Quaternion.identity); break;
+            }
         }
     }
 
-
-
-    public Quaternion RotationCheck(LayerMask layer) //layer비트연산
+    private IEnumerator MonsterAppearPattern()
     {
-        if (layer == LayerMask.GetMask("Monster"))
+        WaitForSeconds wait = new WaitForSeconds(10);
+        while (true)
         {
+            yield return wait;
+            if (!index.Equals(2))
+            {
+                index++;
+            }
+            else if (index.Equals(2))
+            {
+                index = 0;
+            }
+        }
+    }
+    #endregion
+    public Quaternion RotationCheck(LayerMask layer)
+    {
+        Debug.Log(layer == 6);
+        if (layer == 6)
+        {
+            Debug.Log("회전");
             distance = PlayerPos - monsterAppearPos.transform.position;
-
         }
         //else
         //{
@@ -67,5 +86,5 @@ public class GameManager : SingleTone<GameManager>
         return rotation;
     }
 
-   
+  
 }

@@ -28,14 +28,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7788562013597878145}
-  m_LocalRotation: {x: 0, y: 0.040654916, z: 0, w: 0.9991733}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.23000002, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 4.66, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1816513380266178467
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -119,7 +119,7 @@ MonoBehaviour:
   unitStat:
     MaxHp: 10
     MinHp: 0
-    MoveSpeed: -0.1
+    MoveSpeed: -0.5
     AttackPower: 2
     Deefense: 0
     AttackPowerUp: 0
@@ -128,7 +128,7 @@ MonoBehaviour:
   bullet: {fileID: 7107516834756852035, guid: 8c73d4fb92051dc42974c0be96719cf8, type: 3}
   MonsterType:
     serializedVersion: 2
-    m_Bits: 4096
+    m_Bits: 6144
 --- !u!54 &-231379372635165974
 Rigidbody:
   m_ObjectHideFlags: 0

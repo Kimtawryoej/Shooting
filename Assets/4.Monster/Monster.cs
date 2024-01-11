@@ -82,13 +82,10 @@ public class TypesAction : MonoBehaviour
     private UnitStatInfo unitStat;
     private Quaternion rotation;
     private Monster myObject;
-
-    private Dictionary<int, IEnumerator> Actions;
-
     private Vector3[] SaveEndPos = { new Vector3(-11, 0, 3.115f), new Vector3(1, 0, 3.115f), new Vector3(11, 0, 3.115f) };
     private static HashSet<Vector3> EndPos = new HashSet<Vector3>();
     #region 타이머
-    private TimeAgent WaitTimeManager;
+    private TimeAgent WaitShoot;
     #endregion
     public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation, Monster myObject)
     {
@@ -100,50 +97,41 @@ public class TypesAction : MonoBehaviour
 
     public void Set()
     {
-
-        WaitTimeManager = new TimeAgent(1, (TimeAgent) => { myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), WaitTimeManager.CurrentTime); }, (TimeAgent) => { if (SaveEndPos.Last().Equals(EndPos.Last())) { EndPos.Clear(); } });
-
-        Actions = new Dictionary<int, IEnumerator>()
-        {
-            {10,StopMove()},
-            {11,Move()},
-            {12,PlayerAngleShoot()},
-            //{13,()=>{Debug.Log("13")}
-        };
+        WaitShoot = new TimeAgent(1, (TimeAgent) => { }, (TimeAgent) => { myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation); });
     }
-
-    public IEnumerator GetValue()
+    public IEnumerator GetValue() //인스펙터 창에서 체크한 레이어에 따른 코드를 실행시키고 싶으면 움직이는 코루틴 공격하는 코루틴 두개 만들어서 공격이랑 움직임 안 겹치게 해야함
     {
+        WaitForSeconds wait = new WaitForSeconds(1);
         while (true)
         {
             for (int i = 0; i < MonsterType.Count; i++)
             {
-                if (MonsterType[i].Equals(true))
+                if (MonsterType[i].Equals(true)) 
                 {
-                    yield return Actions[i];
-                    if(Actions.ContainsValue(PlayerAngleShoot()))
+                    switch (i)
                     {
-                        Debug.Log("있음");
+                        case 10:
+                            yield return StopMove(wait);
+                            break;
+                        case 11:
+                            yield return MoveMonster();
+                            break;
                     }
-                    //Debug.Log("실행중2");
                 }
             }
-            //yield return PlayerAngleShoot();
-            //yield return Actions[12];
-            //Debug.Log("end");
+
         }
     }
 
     #region ActionMethods
-    private IEnumerator Move()
+    IEnumerator MoveMonster()
     {
-        Debug.Log("움직여라");
-        myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed);
+        myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed * Time.fixedDeltaTime);
         yield return null;
-
+        TimerSystem.Instance.AddTimer(WaitShoot);
     }
 
-    private IEnumerator StopMove()
+    IEnumerator StopMove(WaitForSeconds wait)
     {
         foreach (Vector3 item in SaveEndPos)
         {
@@ -152,17 +140,21 @@ public class TypesAction : MonoBehaviour
                 EndPos.Add(item);
                 break;
             }
+            else if (SaveEndPos.Last().Equals(EndPos.Last()))
+            {
+                EndPos.Clear();
+            }
         }
-        TimerSystem.Instance.AddTimer(WaitTimeManager);
-        yield return null;
-    }
-
-
-    private IEnumerator PlayerAngleShoot()
-    {
-        Debug.Log("쏴라");
-        myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation);
-        yield return new WaitForSeconds(1);
+        for (float i = 0; i <= 1; i += Time.deltaTime)
+        {
+            myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), i);
+            yield return null;
+        }
+        for (float i = 0; i <= 10; i ++)
+        {
+            myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, Quaternion.identity);//**
+            yield return wait;
+        }
     }
     #endregion
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using static UnityEditor.FilePathAttribute;
 
 
 [System.Serializable]
@@ -171,6 +172,17 @@ public abstract class Unit : MonoBehaviour
         ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
         bulletor.Power = bulletPower;
         bulletor.Speed = bulletSpeed;
+    }
+
+    public void BulletRotationShoot(int angle, int count , GameObject bullet, int bulletPower, float bulletSpeed,)
+    {
+        int RotAngle = angle / (count - 1);
+        //ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position,).gameObject.TryGetComponent(out Bullet bulletor);
+        for (int i = 0; i < count - 1; i++)
+        {
+
+        }
+
     }
     #endregion
 }
