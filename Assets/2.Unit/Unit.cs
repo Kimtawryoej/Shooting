@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using static UnityEditor.FilePathAttribute;
+using System.Drawing;
+using System.Security.Cryptography;
+using UnityEngine.UIElements;
 
 
 [System.Serializable]
 public struct UnitStatInfo
 {
-    public int MaxHp;
+    public float MaxHp;
     public int MinHp;
     public float MoveSpeed;
     public int AttackPower;
@@ -23,15 +26,12 @@ public abstract class Unit : MonoBehaviour
 {
     #region 변수
     public LayerMask ObjectLayer;
-
-    protected TimeAgent timeManager;
-
     [SerializeField] protected bool hitcheck;
     [SerializeField] protected UnitStatInfo unitStat;
     public UnitStatInfo UnitStat => unitStat;
 
-    [SerializeField] protected int currentHp;
-    public int CurrentHp => currentHp;
+    [SerializeField] protected float currentHp;
+    public float CurrentHp => currentHp;
 
     protected bool isDead = false;
 
@@ -50,12 +50,6 @@ public abstract class Unit : MonoBehaviour
         ReSetStat();
     }
 
-    protected virtual void Awake()
-    {
-        //spriteRenderer = GetComponent<SpriteRenderer>();
-        //animator = GetComponent<Animator>();
-        //rigid = GetComponent<Rigidbody2D>();
-    }
 
     protected abstract void OnTriggerEnter(Collider other);
 
@@ -118,12 +112,12 @@ public abstract class Unit : MonoBehaviour
         return unitStat.MoveSpeed;
     }
 
-    public int GetHp()
+    public float GetHp()
     {
         return currentHp;
     }
 
-    public int GetMaxHp()
+    public float GetMaxHp()
     {
         return unitStat.MaxHp;
     }
@@ -150,7 +144,7 @@ public abstract class Unit : MonoBehaviour
     protected virtual void Death()
     {
         Debug.Log("죽음");
-        gameObject.SetActive(false);
+        Destroy(gameObject);
         //animator.SetBool("Death", true);
         //if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
         //{
@@ -167,20 +161,29 @@ public abstract class Unit : MonoBehaviour
 
     #region BulletAppear
 
-    public void Shoot(GameObject bullet, int bulletPower, float bulletSpeed,Quaternion rotation)
+    public void Shoot(GameObject bullet, int bulletPower, float bulletSpeed, Quaternion rotation,Vector3 position)
     {
-        ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
+        //ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
+        Instantiate(bullet, position, rotation).gameObject.TryGetComponent(out Bullet bulletor);
         bulletor.Power = bulletPower;
         bulletor.Speed = bulletSpeed;
     }
 
-    public void BulletRotationShoot(int angle, int count , GameObject bullet, int bulletPower, float bulletSpeed,)
+    public void BulletRotationShoot(int angle, int count, GameObject bullet, int bulletPower, float bulletSpeed)
     {
+        GameObject[] bulletor = new GameObject[count];
         int RotAngle = angle / (count - 1);
-        //ObjectPool.Instance.OutObject(ObjectLayer, bullet, transform.position,).gameObject.TryGetComponent(out Bullet bulletor);
-        for (int i = 0; i < count - 1; i++)
+        bulletor[0] = Instantiate(bullet, transform.position, Quaternion.identity);
+        for (int i = 1; i < count; i++)
         {
-
+            bulletor[i] = Instantiate(bullet, transform.position, Quaternion.AngleAxis(i % 2 != 0 ? -RotAngle  : RotAngle, -Vector3.up));
+            //Quaternion은 *가 더하는거
+        }
+        foreach (var BulletSet in bulletor)
+        {
+            BulletSet.gameObject.TryGetComponent(out Bullet Bulletor);
+            Bulletor.Power = bulletPower;
+            Bulletor.Speed = bulletSpeed*-1;
         }
 
     }

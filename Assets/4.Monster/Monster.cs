@@ -4,6 +4,8 @@ using UnityEngine;
 using System;
 using Unity.VisualScripting;
 using System.Linq;
+using UnityEngine.UIElements;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Monster : Unit, I_ObseverManager
 {
@@ -17,33 +19,26 @@ public class Monster : Unit, I_ObseverManager
     #endregion
     private TypesAction monsterAction;
     public TypesAction MonsterAction { get => monsterAction; }
-    private TimeAgent timeNull;
+
+    TimeAgent ActiveFalse;
 
     //왜 함수 밖에서는 매개변수를 불러올수 없음?
-    override protected void Awake()
+    protected void Awake()
     {
         #region ActionsSet
         MonsterTypeBit = new BitArray(new int[] { MonsterType.value.ConvertTo<int>() });
         monsterAction = new TypesAction(MonsterTypeBit, unitStat, transform.rotation, this);
-        monsterAction.Set();
         #endregion
         Instance = this;
     }
     override protected void OnEnable()
     {
         ReSetStat();
-        StartCoroutine(MonsterAction.GetValue());
+        //TimerSystem.Instance.AddTimer(ActiveFalse);
+        StartCoroutine(MonsterAction.GetValueMove());
+        StartCoroutine(MonsterAction.GetValueAttack());
     }
 
-    private void Start()
-    {
-
-    }
-
-    private void FixedUpdate()
-    {
-
-    }
     override protected void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.TryGetComponent(out Bullet bullet))
@@ -84,9 +79,6 @@ public class TypesAction : MonoBehaviour
     private Monster myObject;
     private Vector3[] SaveEndPos = { new Vector3(-11, 0, 3.115f), new Vector3(1, 0, 3.115f), new Vector3(11, 0, 3.115f) };
     private static HashSet<Vector3> EndPos = new HashSet<Vector3>();
-    #region 타이머
-    private TimeAgent WaitShoot;
-    #endregion
     public TypesAction(BitArray MonsterType, UnitStatInfo unitStat, Quaternion rotation, Monster myObject)
     {
         this.MonsterType = MonsterType;
@@ -95,43 +87,61 @@ public class TypesAction : MonoBehaviour
         this.myObject = myObject;
     }
 
-    public void Set()
+    public IEnumerator GetValueMove()
     {
-        WaitShoot = new TimeAgent(1, (TimeAgent) => { }, (TimeAgent) => { myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, myObject.transform.rotation); });
-    }
-    public IEnumerator GetValue() //인스펙터 창에서 체크한 레이어에 따른 코드를 실행시키고 싶으면 움직이는 코루틴 공격하는 코루틴 두개 만들어서 공격이랑 움직임 안 겹치게 해야함
-    {
-        WaitForSeconds wait = new WaitForSeconds(1);
-        while (true)
+        for (int i = 10; i < 12; i++)
         {
-            for (int i = 0; i < MonsterType.Count; i++)
+            if (MonsterType[i].Equals(true))
             {
-                if (MonsterType[i].Equals(true)) 
+                switch (i)
                 {
-                    switch (i)
-                    {
-                        case 10:
-                            yield return StopMove(wait);
-                            break;
-                        case 11:
-                            yield return MoveMonster();
-                            break;
-                    }
+                    case 10:
+                        yield return StopMove();
+                        break;
+                    case 11:
+                        yield return MoveMonster();
+                        break;
                 }
             }
+        }
+    }
 
+    public IEnumerator GetValueAttack()
+    {
+        WaitForSeconds wait = new WaitForSeconds(1f);
+        for (int i = 12; i < 14; i++)
+        {
+            if (MonsterType[i].Equals(true))
+            {
+                switch (i)
+                {
+                    case 12:
+                        yield return Shoot1(wait);
+                        break;
+                    case 13:
+                        yield return Shoot3(wait);
+                        break;
+                }
+            }
         }
     }
 
     #region ActionMethods
     IEnumerator MoveMonster()
     {
-        myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed * Time.fixedDeltaTime);
-        yield return null;
-        TimerSystem.Instance.AddTimer(WaitShoot);
+        while (true)
+        {
+            myObject.transform.Translate(-Vector3.forward * unitStat.MoveSpeed * Time.fixedDeltaTime);
+            if (GameManager.Instance.RangeCheack(myObject.gameObject))
+            {
+                Debug.Log("감지");
+                Destroy(myObject.gameObject);
+            }
+            yield return null;
+        }
     }
 
-    IEnumerator StopMove(WaitForSeconds wait)
+    IEnumerator StopMove()
     {
         foreach (Vector3 item in SaveEndPos)
         {
@@ -140,9 +150,11 @@ public class TypesAction : MonoBehaviour
                 EndPos.Add(item);
                 break;
             }
-            else if (SaveEndPos.Last().Equals(EndPos.Last()))
+            if (SaveEndPos.Last().Equals(EndPos.Last()))
             {
                 EndPos.Clear();
+                EndPos.Add(item);
+                break;
             }
         }
         for (float i = 0; i <= 1; i += Time.deltaTime)
@@ -150,11 +162,35 @@ public class TypesAction : MonoBehaviour
             myObject.transform.position = Vector3.Lerp(GameManager.Instance.MonsterAppearPos.transform.position, EndPos.Last(), i);
             yield return null;
         }
-        for (float i = 0; i <= 10; i ++)
+
+        yield return new WaitForSeconds(3);
+        for (float i = 0; i <= 1; i += Time.deltaTime)
         {
-            myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.5f, Quaternion.identity);//**
+            myObject.transform.position = Vector3.Lerp(EndPos.Last(), GameManager.Instance.MonsterAppearPos.transform.position, i);
+            yield return null;
+        }
+        Destroy(myObject.gameObject);
+    }
+
+    IEnumerator Shoot1(WaitForSeconds wait)
+    {
+        while (true)
+        {
+            myObject.Shoot(myObject.Bullet, unitStat.AttackPower, 0.4f, myObject.transform.rotation, myObject.transform.position);
+            Debug.Log(unitStat.AttackPower);
             yield return wait;
         }
     }
+
+    IEnumerator Shoot3(WaitForSeconds wait)
+    {
+        while (true)
+        {
+            myObject.BulletRotationShoot(60, 3, myObject.Bullet, unitStat.AttackPower, 0.4f);
+            Debug.Log("생성");
+            yield return wait;
+        }
+    }
+
     #endregion
 }

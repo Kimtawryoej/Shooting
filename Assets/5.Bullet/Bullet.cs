@@ -13,7 +13,7 @@ public class Bullet : SingleTone<Bullet>
 
     override public void Awake()
     {
-        timeManager = new TimeAgent(3, (TimeAgent) => { }, (TimeAgent) => InObj());
+        timeManager = new TimeAgent(2, (TimeAgent) => { }, (TimeAgent) => /*ObjectPool.Instance.InObject(layer, gameObject)*/Destroy(gameObject));
     }
     private void OnEnable()
     {
@@ -33,6 +33,6 @@ public class Bullet : SingleTone<Bullet>
 
     public void InObj()
     {
-        ObjectPool.Instance.InObject(layer, gameObject);
+        
     }
 }
